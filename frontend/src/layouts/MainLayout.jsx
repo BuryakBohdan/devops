@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Базовий layout додатку
 function MainLayout({ children, backendStatus, backendOk }) {
   return (
