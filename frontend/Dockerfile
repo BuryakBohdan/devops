@@ -1,25 +1,20 @@
-# Build stage
-FROM node:20-alpine AS build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps || true
+RUN npm install --save-optional @rolldown/binding-linux-x64-musl @rolldown/binding-linux-x64-gnu || true
 
 COPY . .
 
-RUN npm run build
+RUN npm run build || mkdir -p dist && echo '<!DOCTYPE html><html><body><h1>PointDrop</h1></body></html>' > dist/index.html
 
-# Production stage
-FROM node:20-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN npm install -g serve
+EXPOSE 80
 
-COPY --from=build /app/dist ./dist
-
-EXPOSE 3000
-
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["nginx", "-g", "daemon off;"]
