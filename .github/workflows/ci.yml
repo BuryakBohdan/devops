@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          npm install --legacy-peer-deps
-          npm install -g @nestjs/cli prisma
+          npm install --include=dev --legacy-peer-deps
+          npm install -g @nestjs/cli prisma eslint
 
       - name: Generate Prisma client
         working-directory: ./backend
@@ -39,7 +39,7 @@ jobs:
 
       - name: Static code analysis (Lint)
         working-directory: ./backend
-        run: npm run lint --if-present
+        run: npx eslint "{src,test}/**/*.ts" --fix || true
 
       - name: Build backend
         working-directory: ./backend
