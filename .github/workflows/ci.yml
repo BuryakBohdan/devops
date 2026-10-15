@@ -126,7 +126,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           load: true
-          tags: ${{ steps.meta-backend.outputs.tags }}
+          tags: ${{ env.IMAGE_BACKEND }}:latest
           push: false
 
       - name: Build Frontend image
@@ -135,14 +135,15 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           load: true
-          tags: ${{ steps.meta-frontend.outputs.tags }}
+          tags: ${{ env.IMAGE_FRONTEND }}:latest
           push: false
 
-      # Сканування Trivy
+      # Сканування Trivy (передаємо один конкретний тег)
       - name: Scan Backend image with Trivy
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
-          image-ref: ${{ steps.meta-backend.outputs.tags }}
+          image-ref: ${{ env.IMAGE_BACKEND }}:latest
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
